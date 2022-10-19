@@ -1,0 +1,17 @@
+name: ddrnet
+in_channel: 3
+out_channel: data
+type: ddrnet_23
+aux_output: True
+criteria:
+- nickname: loss0
+  name: ce
+  reduction: mean
+  input_keys: [ 'pred', 'target' ]
+  coef: 1.0
+- nickname: loss1
+  name: ce
+  reduction: mean
+  input_keys: [ 'aux0', 'target' ]
+  coef: 0.4
+output_keys: [ 'pred', 'aux0' ]

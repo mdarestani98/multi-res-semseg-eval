@@ -1,0 +1,9 @@
+name: camvid
+root: data/CamVid
+df: [ train.pkl, val.pkl, test.pkl ]
+train_val_test: [ 0.524, 0.145, 0.333 ]
+value_scale: 255
+ignore_index: 255
+base_size: [ 720, 960 ]
+len: 701
+no_classes: 32

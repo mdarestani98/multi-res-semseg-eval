@@ -1,0 +1,9 @@
+name: unet
+in_channel: 3
+out_channel: data
+criteria:
+- nickname: loss0
+  name: ce
+  input_keys: [ pred, target ]
+  reduction: mean
+  coef: 1.0

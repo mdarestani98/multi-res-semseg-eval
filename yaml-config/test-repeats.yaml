@@ -1,0 +1,11 @@
+base_config: base
+data: [ hkphi ]
+repeats: 20
+lr: [ 0.004 ]
+batch_size: [ 8 ]
+image_size: [ 320 ]
+models:
+  network: [ unet_16_M ]
+criteria:
+  ce: [ ce ]
+save_path: results/super-experiments/test-repeats-frozen

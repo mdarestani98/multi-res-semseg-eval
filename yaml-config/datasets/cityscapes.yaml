@@ -1,0 +1,9 @@
+name: cityscapes
+root: data/cityscapes
+df: [ train.pkl, val.pkl, test.pkl ]
+train_val_test: [ 0.595, 0.1, 0.305 ]
+value_scale: 255
+ignore_index: 255
+base_size: [ 1024, 2048 ]
+len: 5000
+no_classes: 19

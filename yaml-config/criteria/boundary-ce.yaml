@@ -1,0 +1,5 @@
+name: boundary-ce
+input_keys: [ 'pred_p', 'pred_d', 'target' ]
+threshold: 0.8
+reduction: mean
+coef: 1.0

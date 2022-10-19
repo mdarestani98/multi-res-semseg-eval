@@ -1,0 +1,3 @@
+name: boundary
+input_keys: [ 'pred_d', 'edge' ]
+coef: 20.0

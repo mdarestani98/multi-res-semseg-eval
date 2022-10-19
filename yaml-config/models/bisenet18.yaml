@@ -1,0 +1,22 @@
+name: bisenet
+in_channel: 3
+out_channel: data
+type: resnet18
+pretrained: False
+criteria:
+- nickname: loss0
+  name: ce
+  reduction: mean
+  input_keys: [ 'pred', 'target' ]
+  coef: 1.0
+- nickname: loss1
+  name: ce
+  reduction: mean
+  input_keys: [ 'aux0', 'target' ]
+  coef: 1.0
+- nickname: loss2
+  name: ce
+  reduction: mean
+  input_keys: [ 'aux1', 'target' ]
+  coef: 1.0
+output_keys: [ pred, aux0, aux1 ]

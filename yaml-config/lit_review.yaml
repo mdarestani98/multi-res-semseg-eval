@@ -1,0 +1,9 @@
+base_config: base
+data: [ hkphi_25 ]
+repeats: 1
+lr: [ 0.01 ]
+batch_size: [ 16 ]
+image_size: [ 256, 384, 512, 768 ]
+models:
+  network: [ bisenet18, ddrnet_23_slim, fastscnn, pidnet_S_aux, pplitesegt, regseg, sfnet_resnet18, unet_16_M ]
+save_path: results/super-experiments/lit_rt

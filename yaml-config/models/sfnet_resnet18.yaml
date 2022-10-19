@@ -1,0 +1,13 @@
+name: sfnet
+in_channel: 3
+out_channel: data
+backbone: resnet-18-deep
+head_type: v2
+fpn_dsn: True
+fa_type: spatial_atten
+criteria:
+- nickname: ce_loss
+  name: ce
+  input_keys: [ pred, target ]
+  reduction: mean
+  coef: 1.0

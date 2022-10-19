@@ -1,0 +1,4 @@
+name: ce
+input_keys: [ 'pred_p', 'target' ]
+reduction: mean
+coef: 0.4

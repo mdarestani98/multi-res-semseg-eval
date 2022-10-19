@@ -1,0 +1,6 @@
+name: ce
+input_keys:
+reduction: mean
+min_kept: 65000
+threshold: 0.7
+coef: 1.0

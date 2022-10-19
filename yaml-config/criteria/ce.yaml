@@ -1,0 +1,3 @@
+name: ce
+reduction: mean
+coef: 1.0

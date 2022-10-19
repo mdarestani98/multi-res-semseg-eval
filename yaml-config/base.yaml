@@ -1,0 +1,44 @@
+data: #dataset yaml file name
+
+train:
+  manual_seed: 104
+  evaluate: True
+  device: cuda
+  no_classes: data
+  batch_size: 8
+  workers: 4
+  save_path:
+
+  criteria: #list of criteria yaml files
+
+  trainable:
+  - nickname: network
+    evaluate: True
+    iterations: 30000
+    model: #model yaml file name
+
+    optimizer:
+      name: sgd
+      lr: 0.004
+      momentum: 0.9
+      weight_decay: 0.0001
+
+    scheduler:
+      name: poly
+      power: 0.9
+
+    checkpoint:
+      resume:
+      start_epoch: 0
+      weights:
+      save:
+
+  augmentation:
+    scale: 2
+    rotate: [ 0.0, 0.0 ]
+    size: [ 320, 320 ]
+
+  metrics:
+    general: [ 'lr' ]
+    train: [ 'loss', 'iou', 'accuracy' ]
+    val: [ 'loss', 'iou', 'accuracy' ]

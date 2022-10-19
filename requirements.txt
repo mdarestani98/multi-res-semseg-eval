@@ -1,0 +1,16 @@
+matplotlib
+numpy
+opencv-contrib-python-headless
+pandas
+PyYAML
+scikit-learn
+scipy
+tensorboard
+tensorboardX
+--find-links https://download.pytorch.org/whl/torch_stable.html
+torch
+--find-links https://download.pytorch.org/whl/torch_stable.html
+torchaudio
+--find-links https://download.pytorch.org/whl/torch_stable.html
+torchvision
+tqdm==4.64.1

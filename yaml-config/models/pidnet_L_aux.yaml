@@ -1,0 +1,31 @@
+name: pidnet
+in_channel: 3
+out_channel: data
+m: 3
+n: 4
+planes: 64
+ppm_planes: 112
+head_planes: 256
+aux_output: True
+output_keys: [ 'pred', 'pred_p', 'pred_d' ]
+criteria:
+- nickname: loss2
+  name: ce
+  input_keys: [ 'pred', 'target' ]
+  reduction: mean
+  coef: 1.0
+- nickname: loss0
+  name: ce
+  input_keys: [ 'pred_p', 'target' ]
+  reduction: mean
+  coef: 0.4
+- nickname: loss1
+  name: boundary
+  input_keys: [ 'pred_d', 'edge' ]
+  coef: 20.0
+- nickname: loss3
+  name: boundary-ce
+  input_keys: [ 'pred_p', 'pred_d', 'target' ]
+  threshold: 0.8
+  reduction: mean
+  coef: 1.0

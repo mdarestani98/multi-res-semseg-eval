@@ -1,0 +1,12 @@
+name: regseg
+in_channel: 3
+out_channel: data
+type: exp53_decoder29
+criteria: # should be ohem-ce
+- nickname: loss0
+  name: ce
+  input_keys: [ 'pred', 'target' ]
+  reduction: mean
+  min_kept: 51000
+  threshold: 0.7
+  coef: 1.0
