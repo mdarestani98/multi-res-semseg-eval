@@ -3,20 +3,20 @@ This is an all-in-one, pytorch-based framework for training and evaluation of st
 different open-source datasets and benchmarks.
 
 ## Supported Datasets
-- Cityscapes: 5000 images of urban scenes with high quality annotations (19 training classes) (https://www.cityscapes-dataset.com/)
-- CamVid: The Cambridge-driving Labeled Video Database with complete metadata (32 classes) (http://mi.eng.cam.ac.uk/research/projects/VideoRec/CamVid/)
+- [Cityscapes](https://www.cityscapes-dataset.com/): 5000 images of urban scenes with high quality annotations (19 training classes) 
+- [CamVid](http://mi.eng.cam.ac.uk/research/projects/VideoRec/CamVid/): The Cambridge-driving Labeled Video Database with complete metadata (32 classes)
 
 ## Supported Models
-- U-Net (2015) (https://arxiv.org/abs/1505.04597)
-- Fast-SCNN (2018) (https://arxiv.org/abs/1902.04502)
-- HRNetV2 (2019) (https://arxiv.org/abs/1904.04514)
-- BiSeNetV2(ResNet18, 101) (2020) (https://arxiv.org/abs/2004.02147)
-- SFNet(ResNet18, STDC1, STDC2) (2020) (https://arxiv.org/abs/2002.10120)
-- DDRNet-23, -23-slim, -39 (2021) (https://arxiv.org/abs/2101.06085)
-- RegSeg, -Large (2021) (https://arxiv.org/abs/2111.09957)
-- STDCNet1, 2 (2021) (https://arxiv.org/abs/2104.13188)
-- PIDNet-S, -M, -L (2022) (https://arxiv.org/abs/2206.02066)
-- PP-LiteSeg-B, T (2022) (https://arxiv.org/abs/2204.02681)
+- [U-Net](https://arxiv.org/abs/1505.04597) (2015) 
+- [Fast-SCNN](https://arxiv.org/abs/1902.04502) (2018)
+- [HRNetV2](https://arxiv.org/abs/1904.04514) (2019)
+- [BiSeNetV2](https://arxiv.org/abs/2004.02147)(ResNet18, 101) (2020) 
+- [SFNet](https://arxiv.org/abs/2002.10120)(ResNet18, STDC1, STDC2) (2020)
+- [DDRNet](https://arxiv.org/abs/2101.06085)-23, -23-slim, -39 (2021) 
+- [RegSeg](https://arxiv.org/abs/2111.09957), -Large (2021) 
+- [STDCNet](https://arxiv.org/abs/2104.13188)1, 2 (2021) 
+- [PIDNet](https://arxiv.org/abs/2206.02066)-S, -M, -L (2022) 
+- [PP-LiteSeg](https://arxiv.org/abs/2204.02681)-B, T (2022) 
 
 ## Environment
 The code is developed under the following configurations:
