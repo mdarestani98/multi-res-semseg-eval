@@ -1,13 +1,15 @@
 # ------------------------------------------------------------------------------
 # Written by Jiacong Xu (jiacong.xu@tamu.edu)
 # ------------------------------------------------------------------------------
-import scipy.io
+
+"""Implementation of PIDNet, https://github.com/XuJiacong/PIDNet"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 from utils.config import DotDict
-from utils.tools import NetworkHandler, calculate_fps, find_size_fixed_fps, profile, multiple_profile, get_latency_curve
+from utils.tools import NetworkHandler
 
 BatchNorm2d = nn.BatchNorm2d
 bn_mom = 0.1
@@ -561,15 +563,7 @@ class Handler(NetworkHandler):
 
 
 if __name__ == '__main__':
-    model = PIDNet(m=2, n=3, num_classes=8, planes=32, ppm_planes=96, head_planes=128, aux=False).to('cuda')
-    x = torch.randn((8, 3, 288, 288)).to('cuda')
+    model = PIDNet(m=2, n=3, num_classes=19, planes=32, ppm_planes=96, head_planes=128, aux=False).to('cuda')
+    x = torch.randn((16, 3, 1024, 1024)).to('cuda')
     y = model(x)
-    # print(y[0].shape)
-    # from ptflops import get_model_complexity_info
-    # macs, params = get_model_complexity_info(model, (3, 288, 288), verbose=True)
-    # fps = calculate_fps(model, (288, 288))
-    # print(fps)
-    # print(find_size_fixed_fps(model, 50))
-    # multiple_profile(model, [64, 128, 192, 256, 384, 512, 768])
-    # lat = get_latency_curve(model)
-    # scipy.io.savemat('pidnet.mat', mdict={'lat': lat})
+    print(y.shape)

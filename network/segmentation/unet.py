@@ -1,10 +1,5 @@
-# ---------------------------------------------------------------------
-# a customizable U-Net with all skip paths possible and residual blocks
-#
-# (C) 2022 Mohammad Farahani, CUHK, Hong Kong
-# Released under the MIT License
-# email mdarstani@mae.cuhk.edu.hk
-# ---------------------------------------------------------------------
+"""Implementation of U-Net, https://github.com/4uiiurz1/pytorch-nested-unet"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

@@ -1,3 +1,5 @@
+"""Implementation of PP-LiteSeg, https://github.com/Deci-AI/super-gradients"""
+
 from abc import ABC, abstractmethod
 
 import torch
@@ -401,11 +403,11 @@ class PPLiteSegT(PPLiteSegBase):
 
 
 def check():
-    model = PPLiteSegB(19, 3, 0.0, True)
+    model = PPLiteSegB(19, 3, 0.0, True).cuda()
     model.eval()
-    x = torch.randn((32, 3, 320, 320))
+    x = torch.randn((32, 3, 320, 320)).cuda()
     y = model(x)
-    print(len(y))
+    print([yy.shape for yy in y])
 
 
 if __name__ == '__main__':

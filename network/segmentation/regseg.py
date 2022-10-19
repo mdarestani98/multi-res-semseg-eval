@@ -1,3 +1,5 @@
+"""Implementation of RegSeg, https://github.com/RolandGao/RegSeg"""
+
 from typing import Any
 
 import torch
@@ -331,7 +333,7 @@ def generate_stage2(ds, block_fun):
 def check():
     model = RegSeg('exp48_decoder26', 19).cuda()
     model.train()
-    x = torch.randn((32, 3, 320, 320), requires_grad=True).cuda()
+    x = torch.randn((16, 3, 1024, 1024), requires_grad=True).cuda()
     y = model(x)
     print(y.shape)
 

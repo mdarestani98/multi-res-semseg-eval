@@ -1,9 +1,10 @@
+"""Backbone for SFNet"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import init
 import math
-# from network.nn.mynn import Norm2d, Upsample
 
 
 class ConvX(nn.Module):

@@ -1,12 +1,10 @@
-import math
+"""Implementation of DDRNet, https://github.com/ydhongHIT/DDRNet"""
+
 from typing import Any
 
 import torch
-import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn import init
-from collections import OrderedDict
 
 # BatchNorm2d = nn.SyncBatchNorm
 from network.segmentation.hrnet import BasicBlock

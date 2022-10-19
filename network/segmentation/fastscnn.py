@@ -4,18 +4,18 @@
 # Copyright (c) 2017
 ###########################################################################
 
-"""Fast Segmentation Convolutional Neural Network"""
-import os
+"""Implementation of Fast-SCNN, https://github.com/Tramac/Fast-SCNN-pytorch"""
 
 import scipy.io
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-__all__ = ['FastSCNN']
-
 from utils.config import DotDict
-from utils.tools import NetworkHandler, calculate_fps, find_size_fixed_fps, multiple_profile, profile, get_latency_curve
+from utils.tools import NetworkHandler, get_latency_curve
+
+
+__all__ = ['FastSCNN']
 
 
 class FastSCNN(nn.Module):
@@ -249,14 +249,3 @@ if __name__ == '__main__':
     model = FastSCNN(8, True).to('cuda')
     x = torch.randn((8, 3, 288, 288)).to('cuda')
     y = model(x)
-    # print(y[0].shape)
-    # print(y[1].shape)
-    from ptflops import get_model_complexity_info
-    # macs, params = get_model_complexity_info(model, (3, 288, 288), verbose=True)
-    # fps = calculate_fps(model, (288, 288))
-    # print(fps)
-    # print(find_size_fixed_fps(model, 50))
-    # profile(model, (64, 64))
-    # multiple_profile(model, [64, 128, 192, 256, 384, 512, 768])
-    lat = get_latency_curve(model)
-    scipy.io.savemat('fastscnn.mat', mdict={'lat': lat})

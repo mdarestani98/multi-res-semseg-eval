@@ -2,6 +2,7 @@
 Implementation of paper: "Rethinking BiSeNet For Real-time Semantic Segmentation", https://arxiv.org/abs/2104.13188
 Based on original implementation: https://github.com/MichaelFan01/STDC-Seg, cloned 23/08/2021, commit 59ff37f
 """
+"""Backbone for PP-LiteSeg"""
 
 import torch
 import torch.nn as nn

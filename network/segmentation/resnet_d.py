@@ -3,6 +3,7 @@
 # Code Adapted from:
 # https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 """
+"""Backbone resnet for SFNet"""
 import torch
 import torch.nn as nn
 import torch.utils.model_zoo as model_zoo

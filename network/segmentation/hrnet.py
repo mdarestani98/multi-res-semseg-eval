@@ -1,14 +1,14 @@
+"""Implementation of HRNetV2, https://github.com/HRNet/HRNet-Semantic-Segmentation"""
+
 import os
-import time
 
 import numpy as np
-import scipy.io
 import torch
 import torch.nn.functional as F
 from torch import nn
 
 from utils.config import DotDict
-from utils.tools import NetworkHandler, calculate_fps, find_size_fixed_fps, profile, multiple_profile, get_latency_curve
+from utils.tools import NetworkHandler
 
 BatchNorm2d = nn.BatchNorm2d
 BN_MOMENTUM = 0.01
@@ -490,9 +490,6 @@ class HighResolutionNet(nn.Module):
             model_dict = self.state_dict()
             pretrained_dict = {k: v for k, v in pretrained_dict.items()
                                if k in model_dict.keys()}
-            # for k, _ in pretrained_dict.items():
-            #    logger.info(
-            #        '=> loading {} pretrained model {}'.format(k, pretrained))
             model_dict.update(pretrained_dict)
             self.load_state_dict(model_dict)
 
@@ -512,17 +509,10 @@ class Handler(NetworkHandler):
 
 def check():
     model = HighResolutionNet(8, DEFAULT_EXTRA, 4).to('cuda')
-    # model.eval()
-    from ptflops import get_model_complexity_info
-    # macs, params = get_model_complexity_info(model, (3, 288, 288), verbose=True)
-    # print(macs, params)
-    # fps = calculate_fps(model, (64, 64))
-    # print(fps)
-    # print(find_size_fixed_fps(model, 50))
-    # profile(model, (64, 64))
-    # multiple_profile(model, [64, 128, 192, 256, 384, 512, 768])
-    lat = get_latency_curve(model)
-    scipy.io.savemat('hrnet.mat', mdict={'lat': lat})
+    model.eval()
+    x = torch.randn((16, 3, 1024, 1024)).cuda()
+    y = model(x)
+    print(y.shape)
 
 
 if __name__ == '__main__':

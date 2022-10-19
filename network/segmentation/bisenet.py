@@ -1,3 +1,5 @@
+"""Implementation of BiSeNetV2, https://github.com/CoinCheung/BiSeNet"""
+
 from typing import Any
 
 import torch

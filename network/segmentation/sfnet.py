@@ -1,6 +1,9 @@
 # Implementation of SFNet ResNet series.
 # Author: Xiangtai(lxt@pku.edu.cn)
 # Date: 2022/5/20
+
+"""https://github.com/lxtGH/SFSegNets"""
+
 from typing import Any
 
 import torch.nn as nn
