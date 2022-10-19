@@ -1,10 +1,9 @@
 base_config: base
-data: [ hkphi ]
+data: [ cityscapes ]
 repeats: 1
 lr: [ 0.01 ]
 batch_size: [ 16 ]
 image_size: [ 1536 ]
 models:
   network: [ pidnet_L_aux ]
-save_path: results/super-experiments/dummy
-train.trainable.network.iterations: [ 180 ]
+save_path: results/dummy
