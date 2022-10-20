@@ -1,4 +1,6 @@
 venv/
-Data/
+data/**/*.png
+data/**/*.json
 .idea/
 results/
+weights/*.pth

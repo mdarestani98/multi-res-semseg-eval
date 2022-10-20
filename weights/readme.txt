@@ -1,0 +1,1 @@
+Put all checkpoint/pretrained .pth files in this directory.
