@@ -14,6 +14,10 @@ from utils.tools import NetworkHandler
 BatchNorm2d = nn.BatchNorm2d
 bn_mom = 0.1
 
+PRETRAINED = {'ddrnet_23': './weights/ddrnet_23#imagenet.pth',
+              'ddrnet_23_slim': './weights/ddrnet_23_slim#imagenet.pth',
+              'ddrnet_39': './weights/ddrnet_39#imagenet.pth'}
+
 
 def conv3x3(in_planes, out_planes, stride=1):
     """3x3 convolution with padding"""
@@ -173,7 +177,8 @@ class SegmentHead(nn.Module):
 
 class DualResNet23(nn.Module):
 
-    def __init__(self, block, layers, num_classes=19, planes=64, spp_planes=128, head_planes=128, augment=False):
+    def __init__(self, block, layers, num_classes=19, planes=64, spp_planes=128, head_planes=128, augment=False,
+                 pretrained=None):
         super(DualResNet23, self).__init__()
 
         highres_planes = planes * 2
@@ -224,6 +229,13 @@ class DualResNet23(nn.Module):
         self.layer5_ = self._make_layer(Bottleneck, highres_planes, highres_planes, 1)
 
         self.layer5 = self._make_layer(Bottleneck, planes * 8, planes * 8, 1, stride=2)
+
+        if pretrained is not None:
+            d = torch.load(PRETRAINED.get(pretrained), map_location='cpu')['state_dict']
+            try:
+                self.load_state_dict(d)
+            except:
+                print('could not load pretrained weights')
 
         self.spp = DAPPM(planes * 16, spp_planes, planes * 4)
 
@@ -314,7 +326,8 @@ class DualResNet23(nn.Module):
 
 class DualResNet39(nn.Module):
 
-    def __init__(self, block, layers, num_classes=19, planes=64, spp_planes=128, head_planes=128, augment=False):
+    def __init__(self, block, layers, num_classes=19, planes=64, spp_planes=128, head_planes=128, augment=False,
+                 pretrained=None):
         super(DualResNet39, self).__init__()
 
         highres_planes = planes * 2
@@ -378,6 +391,13 @@ class DualResNet39(nn.Module):
         self.layer5_ = self._make_layer(Bottleneck, highres_planes, highres_planes, 1)
 
         self.layer5 = self._make_layer(Bottleneck, planes * 8, planes * 8, 1, stride=2)
+
+        if pretrained is not None:
+            d = torch.load(PRETRAINED.get(pretrained))['state_dict']
+            try:
+                self.load_state_dict(d)
+            except:
+                print('could not load pretrained weights')
 
         self.spp = DAPPM(planes * 16, spp_planes, planes * 4)
 
@@ -478,10 +498,10 @@ class Handler(NetworkHandler):
     def get_from_config(cfg: DotDict) -> Any:
         if cfg.type == 'ddrnet_23':
             return DualResNet23(BasicBlock, [2, 2, 2, 2], num_classes=cfg.out_channel, planes=64, spp_planes=128,
-                                head_planes=128, augment=cfg.aux_output)
+                                head_planes=128, augment=cfg.aux_output, pretrained=cfg.type if cfg.pretrained else None)
         elif cfg.type == 'ddrnet_23_slim':
             return DualResNet23(BasicBlock, [2, 2, 2, 2], num_classes=cfg.out_channel, planes=32, spp_planes=128,
-                                head_planes=64, augment=cfg.aux_output)
+                                head_planes=64, augment=cfg.aux_output, pretrained=cfg.type if cfg.pretrained else None)
         elif cfg.type == 'ddrnet_39':
             return DualResNet39(BasicBlock, [3, 4, 6, 3], num_classes=cfg.out_channel, planes=64, spp_planes=128,
                                 head_planes=256, augment=cfg.aux_output)

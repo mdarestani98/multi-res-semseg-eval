@@ -3,7 +3,7 @@ data: [ cityscapes ]
 repeats: 1
 lr: [ 0.01 ]
 batch_size: [ 16 ]
-image_size: [ 1536 ]
+image_size: [ [1024, 2048] ]
 models:
-  network: [ pidnet_L_aux ]
+  network: []
 save_path: results/dummy

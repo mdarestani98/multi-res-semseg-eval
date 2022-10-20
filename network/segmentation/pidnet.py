@@ -15,6 +15,10 @@ BatchNorm2d = nn.BatchNorm2d
 bn_mom = 0.1
 algc = False
 
+PRETRAINED = {'pidnet_S_aux': './weights/pidnet_S_aux#imagenet.pth',
+              'pidnet_M_aux': './weights/pidnet_M_aux#imagenet.pth',
+              'pidnet_L_aux': './weights/pidnet_L_aux#imagenet.pth'}
+
 
 class BasicBlock(nn.Module):
     expansion = 1
@@ -388,7 +392,8 @@ class Bag(nn.Module):
 
 class PIDNet(nn.Module):
 
-    def __init__(self, m=2, n=3, num_classes=19, planes=64, ppm_planes=96, head_planes=128, aux=True, zoom_factor=8):
+    def __init__(self, m=2, n=3, num_classes=19, planes=64, ppm_planes=96, head_planes=128, aux=True, zoom_factor=8,
+                 pretrained=None):
         super(PIDNet, self).__init__()
         zoom_factor = zoom_factor // 2
         init_stride = int(zoom_factor ** 0.5)
@@ -429,6 +434,14 @@ class PIDNet(nn.Module):
         self.layer4_ = self._make_layer(BasicBlock, planes * 2, planes * 2, m)
         self.layer5_ = self._make_layer(Bottleneck, planes * 2, planes * 2, 1)
 
+        if pretrained is not None:
+            try:
+                d = torch.load(PRETRAINED.get(pretrained), map_location='cpu')['state_dict']
+                self.load_state_dict(d)
+                pretrained = None
+            except:
+                pretrained = pretrained
+
         # D Branch
         if m == 2:
             self.layer3_d = self._make_single_layer(BasicBlock, planes * 2, planes)
@@ -441,7 +454,6 @@ class PIDNet(nn.Module):
                 nn.Conv2d(planes * 8, planes * 2, kernel_size=3, padding=1, bias=False),
                 BatchNorm2d(planes * 2, momentum=bn_mom),
             )
-            self.spp = PAPPM(planes * 16, ppm_planes, planes * 4)
             self.dfm = Light_Bag(planes * 4, planes * 4)
         else:
             self.layer3_d = self._make_single_layer(BasicBlock, planes * 2, planes * 2)
@@ -454,10 +466,21 @@ class PIDNet(nn.Module):
                 nn.Conv2d(planes * 8, planes * 2, kernel_size=3, padding=1, bias=False),
                 BatchNorm2d(planes * 2, momentum=bn_mom),
             )
-            self.spp = DAPPM(planes * 16, ppm_planes, planes * 4)
             self.dfm = Bag(planes * 4, planes * 4)
 
         self.layer5_d = self._make_layer(Bottleneck, planes * 2, planes * 2, 1)
+
+        if pretrained is not None:
+            try:
+                d = torch.load(PRETRAINED.get(pretrained), map_location='cpu')['state_dict']
+                self.load_state_dict(d)
+            except:
+                print('could not load pretrained weights')
+
+        if m == 2:
+            self.spp = PAPPM(planes * 16, ppm_planes, planes * 4)
+        else:
+            self.spp = DAPPM(planes * 16, ppm_planes, planes * 4)
 
         # Prediction Head
         if self.aux:

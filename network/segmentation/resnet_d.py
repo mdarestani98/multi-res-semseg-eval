@@ -3,7 +3,7 @@
 # Code Adapted from:
 # https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 """
-"""Backbone resnet for SFNet"""
+
 import torch
 import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
@@ -174,11 +174,12 @@ def resnet18(pretrained=True, **kwargs):
     """Constructs a ResNet-18 model.
 
     Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        pretrained (bool): If True, returns a model pretrained on ImageNet
     """
     model = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
     if pretrained:
-        model.load_state_dict(torch.load("./pretrained_models/resnet18-deep-inplane128.pth", map_location="cpu"))
+        d = torch.load('./weights/resnet18-deep#imagenet.pth', map_location='cpu')['state_dict']
+        model.load_state_dict(d)
     return model
 
 
@@ -186,11 +187,12 @@ def resnet50(pretrained=True, **kwargs):
     """Constructs a ResNet-50 model.
 
     Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        pretrained (bool): If True, returns a model pretrained on ImageNet
     """
     model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
     if pretrained:
-        model.load_state_dict(torch.load("./pretrained_models/resnet50-deep.pth", map_location='cpu'))
+        d = torch.load('./weights/resnet50-deep#imagenet.pth', map_location='cpu')['state_dict']
+        model.load_state_dict(d)
     return model
 
 
@@ -198,11 +200,12 @@ def resnet101(pretrained=True, **kwargs):
     """Constructs a ResNet-101 model.
 
     Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        pretrained (bool): If True, returns a model pretrained on ImageNet
     """
     model = ResNet(Bottleneck, [3, 4, 23, 3], **kwargs)
     if pretrained:
-        model.load_state_dict(torch.load("./pretrained_models/resnet101-deep.pth",map_location='cpu'))
+        d = torch.load('./weights/resnet101-deep#imagenet.pth', map_location='cpu')['state_dict']
+        model.load_state_dict(d)
     return model
 
 
@@ -210,7 +213,7 @@ def resnet152(pretrained=True, **kwargs):
     """Constructs a ResNet-152 model.
 
     Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
+        pretrained (bool): If True, returns a model pretrained on ImageNet
     """
     model = ResNet(Bottleneck, [3, 8, 36, 3], **kwargs)
     if pretrained:

@@ -122,7 +122,7 @@ class CatBottleneck(nn.Module):
 # STDC2Net
 class STDCNet1446(nn.Module):
     def __init__(self, base=64, layers=[4, 5, 3], block_num=4, type="cat", num_classes=1000, dropout=0.20,
-                 pretrain_model='./pretrained_models/STDCNet1446_76.47.tar',
+                 pretrain_model='./weights/stdcnet2#imagenet.pth',
                  use_conv_last=False, norm_layer=nn.BatchNorm2d,
                  ):
         super(STDCNet1446, self).__init__()
@@ -147,7 +147,6 @@ class STDCNet1446(nn.Module):
         self.x32 = nn.Sequential(self.features[11:])
 
         if pretrain_model:
-            print('use pretrain model {}'.format(pretrain_model))
             self.init_weight(pretrain_model)
         else:
             self.init_params()
@@ -219,7 +218,7 @@ class STDCNet1446(nn.Module):
 # STDC1Net
 class STDCNet813(nn.Module):
     def __init__(self, base=64, layers=[2, 2, 2], block_num=4, type="cat", num_classes=1000, dropout=0.20,
-                 pretrain_model='./pretrained_models/STDCNet813_73.91.tar',
+                 pretrain_model='./weights/stdcnet1#imagenet.pth',
                  use_conv_last=False, norm_layer=nn.BatchNorm2d):
         super(STDCNet813, self).__init__()
         if type == "cat":
@@ -243,7 +242,6 @@ class STDCNet813(nn.Module):
         self.x32 = nn.Sequential(self.features[6:])
 
         if pretrain_model:
-            print('use pretrain model {}'.format(pretrain_model))
             self.init_weight(pretrain_model)
         else:
             self.init_params()

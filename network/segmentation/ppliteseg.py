@@ -359,9 +359,11 @@ class Handler(NetworkHandler):
 
 
 class PPLiteSegB(PPLiteSegBase):
-    def __init__(self, num_classes: int, in_channels: int = 3, dropout: float = 0.0, aux: bool = False):
+    def __init__(self, num_classes: int, in_channels: int = 3, dropout: float = 0.0, aux: bool = False,
+                 pretrained: bool = False):
         backbone = STDC2Backbone(in_channels=in_channels,
-                                 out_down_ratios=[8, 16, 32])
+                                 out_down_ratios=[8, 16, 32],
+                                 pretrained=pretrained)
         super().__init__(num_classes=num_classes,
                          backbone=backbone,
                          projection_channels_list=[96, 128, 128],
@@ -381,9 +383,11 @@ class PPLiteSegB(PPLiteSegBase):
 
 
 class PPLiteSegT(PPLiteSegBase):
-    def __init__(self, num_classes: int, in_channels: int = 3, dropout: float = 0.0, aux: bool = False):
+    def __init__(self, num_classes: int, in_channels: int = 3, dropout: float = 0.0, aux: bool = False,
+                 pretrained: bool = False):
         backbone = STDC1Backbone(in_channels=in_channels,
-                                 out_down_ratios=[8, 16, 32])
+                                 out_down_ratios=[8, 16, 32],
+                                 pretrained=pretrained)
         super().__init__(num_classes=num_classes,
                          backbone=backbone,
                          projection_channels_list=[64, 128, 128],

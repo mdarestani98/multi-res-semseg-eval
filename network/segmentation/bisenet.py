@@ -223,8 +223,8 @@ class Handler(NetworkHandler):
 
 
 def check():
-    model = BiSeNet(19, 'resnet18', False).cuda()
-    x = torch.randn((32, 3, 320, 320)).cuda()
+    model = BiSeNet(19, 'resnet18', True).cuda()
+    x = torch.randn((32, 3, 1024, 1024)).cuda()
     model.train()
     y = model(x)
     print([yy.shape for yy in y])

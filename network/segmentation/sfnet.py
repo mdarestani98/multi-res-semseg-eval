@@ -488,7 +488,7 @@ class UpperNetAlignHeadV2(nn.Module):
 
 class AlignNetResNet(nn.Module):
     def __init__(self, num_classes, trunk='resnet-101', variant='D', head_type="v1",
-                 skip='m1', skip_num=48, fpn_dsn=False, fa_type="spatial", global_context="ppm"):
+                 skip='m1', skip_num=48, fpn_dsn=False, fa_type="spatial", global_context="ppm", pretrained=False):
         super(AlignNetResNet, self).__init__()
         self.variant = variant
         self.skip = skip
@@ -496,11 +496,11 @@ class AlignNetResNet(nn.Module):
         self.fpn_dsn = fpn_dsn
 
         if trunk == trunk == 'resnet-50-deep':
-            resnet = resnet50(pretrained=False)
+            resnet = resnet50(pretrained=pretrained)
         elif trunk == 'resnet-101-deep':
-            resnet = resnet101(pretrained=False)
+            resnet = resnet101(pretrained=pretrained)
         elif trunk == 'resnet-18-deep':
-            resnet = resnet18(pretrained=False)
+            resnet = resnet18(pretrained=pretrained)
         else:
             raise ValueError("Not a valid network arch")
 
@@ -566,9 +566,9 @@ class AlignNetSTDCnet(nn.Module):
         self.fpn_dsn = fpn_dsn
 
         if trunk == 'stdc1':
-            self.backbone = STDCNet813(norm_layer=nn.BatchNorm2d, pretrain_model=None)
+            self.backbone = STDCNet813(norm_layer=nn.BatchNorm2d)
         elif trunk == 'stdc2':
-            self.backbone = STDCNet1446(norm_layer=nn.BatchNorm2d, pretrain_model=None)
+            self.backbone = STDCNet1446(norm_layer=nn.BatchNorm2d)
         else:
             raise ValueError("Not a valid network arch")
         if head_type == "v2":
@@ -629,9 +629,13 @@ class STDCnetFPN(nn.Module):
 class Handler(NetworkHandler):
     @staticmethod
     def get_from_config(cfg: DotDict) -> Any:
+        if cfg.head_type is None:
+            cfg.head_type = 'v1'
+        if cfg.fa_type is None:
+            cfg.fa_type = 'spatial'
         if 'resnet' in cfg.backbone:
-            return AlignNetResNet(num_classes=cfg.out_channel, trunk=cfg.backbone, head_type=cfg.head_type,
-                                  fpn_dsn=cfg.fpn_dsn, fa_type=cfg.fa_type)
+            return AlignNetResNet(num_classes=cfg.out_channel, trunk=cfg.backbone, fpn_dsn=cfg.fpn_dsn,
+                                  head_type=cfg.head_type, fa_type=cfg.fa_type)
         elif 'stdc' in cfg.backbone:
-            return AlignNetSTDCnet(num_classes=cfg.out_channel, trunk=cfg.backbone, head_type=cfg.head_type,
-                                   fpn_dsn=cfg.fpn_dsn, fa_type=cfg.fa_type)
+            return AlignNetSTDCnet(num_classes=cfg.out_channel, trunk=cfg.backbone, fpn_dsn=cfg.fpn_dsn,
+                                   head_type=cfg.head_type, fa_type=cfg.fa_type)

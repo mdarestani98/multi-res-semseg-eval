@@ -9,8 +9,8 @@ different open-source datasets and benchmarks.
 ## Supported Models
 - [U-Net](https://arxiv.org/abs/1505.04597) (2015) 
 - [Fast-SCNN](https://arxiv.org/abs/1902.04502) (2018)
-- [HRNetV2](https://arxiv.org/abs/1904.04514) (2019)
-- [BiSeNetV2](https://arxiv.org/abs/2004.02147)(ResNet18, 101) (2020) 
+- [BiSeNetV1](https://arxiv.org/abs/1808.00897)(ResNet18, 101) (2018)
+- [HRNetV2](https://arxiv.org/abs/1904.04514) (2019) 
 - [SFNet](https://arxiv.org/abs/2002.10120)(ResNet18, STDC1, STDC2) (2020)
 - [DDRNet](https://arxiv.org/abs/2101.06085)-23, -23-slim, -39 (2021) 
 - [RegSeg](https://arxiv.org/abs/2111.09957), -Large (2021) 

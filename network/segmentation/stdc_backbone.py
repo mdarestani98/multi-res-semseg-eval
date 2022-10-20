@@ -12,6 +12,10 @@ from abc import ABC, abstractmethod
 from torch import nn as nn
 
 
+PRETRAINED = {'stdc1': './weights/stdc1#imagenet.pth',
+              'stdc2': './weights/stdc2#imagenet.pth'}
+
+
 class ConvBNReLU(nn.Module):
     """
     Class for Convolution2d-Batchnorm2d-Relu layer. Default behaviour is Conv-BN-Relu. To exclude Batchnorm module use
@@ -236,14 +240,26 @@ class SegmentationHead(nn.Module):
 
 
 class STDC1Backbone(STDCBackbone):
-    def __init__(self, in_channels: int = 3, out_down_ratios: Union[tuple, list] = (32,)):
+    def __init__(self, in_channels: int = 3, out_down_ratios: Union[tuple, list] = (32,), pretrained: bool = False):
         super().__init__(block_types=["conv", "conv", "stdc", "stdc", "stdc"],
                          ch_widths=[32, 64, 256, 512, 1024], num_blocks=[1, 1, 2, 2, 2], stdc_steps=4,
                          in_channels=in_channels, out_down_ratios=out_down_ratios)
+        if pretrained:
+            try:
+                d = torch.load(PRETRAINED['stdc1'], map_location='cpu')['state_dict']
+                self.load_state_dict(d)
+            except:
+                print('could not load pretrained weights')
 
 
 class STDC2Backbone(STDCBackbone):
-    def __init__(self, in_channels: int = 3, out_down_ratios: Union[tuple, list] = (32,)):
+    def __init__(self, in_channels: int = 3, out_down_ratios: Union[tuple, list] = (32,), pretrained: bool = False):
         super().__init__(block_types=["conv", "conv", "stdc", "stdc", "stdc"],
                          ch_widths=[32, 64, 256, 512, 1024], num_blocks=[1, 1, 4, 5, 3], stdc_steps=4,
                          in_channels=in_channels, out_down_ratios=out_down_ratios)
+        if pretrained:
+            try:
+                d = torch.load(PRETRAINED['stdc2'], map_location='cpu')['state_dict']
+                self.load_state_dict(d)
+            except:
+                print('could not load pretrained weights')
