@@ -363,7 +363,6 @@ class ContextPath(nn.Module):
         return feat8, feat16_up
 
 
-
 class SegmentationHead(nn.Module):
     def __init__(self, in_channels: int, mid_channels: int, num_classes: int, dropout: float):
         super(SegmentationHead, self).__init__()

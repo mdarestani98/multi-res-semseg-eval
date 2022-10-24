@@ -1,0 +1,35 @@
+name: stdc
+type: 2
+in_channel: 3
+out_channel: data
+dropout: 0.2
+aux_output: True
+pretrained: False
+criteria: # should be ohem-ce
+- nickname: loss0
+  name: ce
+  input_keys: [ 'pred', 'target' ]
+  reduction: mean
+  min_kept: 51000
+  threshold: 0.7
+  coef: 1.0
+- nickname: loss1
+  name: ce
+  input_keys: [ 'aux0', 'target' ]
+  reduction: mean
+  min_kept: 51000
+  threshold: 0.7
+  coef: 1.0
+- nickname: loss2
+  name: ce
+  input_keys: [ 'aux1', 'target' ]
+  reduction: mean
+  min_kept: 51000
+  threshold: 0.7
+  coef: 1.0
+- nickname: loss3
+  name: dice-bce-edge
+  input_keys: [ 'det', 'target' ]
+  weights: [ 1, 1 ]
+  coef: 1.0
+output_keys: [ 'pred', 'aux0', 'aux1', 'det' ]
