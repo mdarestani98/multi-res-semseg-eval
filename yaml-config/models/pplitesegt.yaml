@@ -4,6 +4,7 @@ in_channel: 3
 out_channel: data
 dropout: 0.0
 aux_output: True
+pretrained: False
 criteria: # should be ohem-ce
 - nickname: loss0
   name: ce
