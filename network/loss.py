@@ -204,6 +204,90 @@ class OhemCrossEntropyLoss(nn.Module):
         return avg_loss
 
 
+class BinaryDiceLoss(nn.Module):
+    def __init__(self, apply_sigmoid: bool = True, eps: float = 1e-5, smooth: float = 1.):
+        super(BinaryDiceLoss, self).__init__()
+        self.apply_sigmoid = apply_sigmoid
+        self.eps = eps
+        self.smooth = smooth
+
+    def forward(self, pred: Tensor, target: Tensor) -> Tensor:
+        if self.apply_sigmoid:
+            pred = F.sigmoid(pred)
+        if target.size() == pred.size():
+            labels_one_hot = target
+        elif target.dim() == 3:
+            if pred.size(1) == 1:
+                labels_one_hot = target.unsqueeze(1)
+            else:
+                labels_one_hot = to_one_hot(target, num_classes=pred.shape[1])
+        else:
+            raise AssertionError
+        intersection = labels_one_hot * target
+        loss = 1. - (2. * intersection + self.smooth) / (labels_one_hot + target + self.smooth + self.eps)
+        return loss
+
+
+class DiceBCEEdgeLoss(nn.Module):
+    def __init__(self, no_classes: int, edge_kernel: int = 3, ignore_index: int = 255,
+                 weights: Union[tuple, list] = (1, 1)):
+        super(DiceBCEEdgeLoss, self).__init__()
+        self.no_classes = no_classes
+        self.edge_kernel = edge_kernel
+        self.ignore_index = ignore_index
+        self.weights = weights
+        self.bce = nn.BCEWithLogitsLoss()
+        self.dice = BinaryDiceLoss(apply_sigmoid=True)
+
+    def forward(self, pred: Tensor, target: Tensor) -> Tensor:
+        edge_target = target_to_binary_edge(target, num_classes=self.num_classes, kernel_size=self.edge_kernel,
+                                            ignore_index=self.ignore_index, flatten_channels=True)
+        loss = self.bce(pred, edge_target) * self.weights[0] + self.dice(pred, edge_target) * self.weights[1]
+        return loss
+
+
+def to_one_hot(target: torch.Tensor, num_classes: int, ignore_index: int = None):
+    num_classes = num_classes if ignore_index is None else num_classes + 1
+
+    one_hot = F.one_hot(target, num_classes).permute((0, 3, 1, 2))
+
+    if ignore_index is not None:
+        one_hot = torch.cat([one_hot[:, :ignore_index], one_hot[:, ignore_index + 1:]], dim=1)
+
+    return one_hot
+
+
+def one_hot_to_binary_edge(x: torch.Tensor,
+                           kernel_size: int,
+                           flatten_channels: bool = True) -> torch.Tensor:
+    if kernel_size < 0 or kernel_size % 2 == 0:
+        raise ValueError(f"kernel size must be an odd positive values, such as [1, 3, 5, ..], found: {kernel_size}")
+    _kernel = torch.ones(x.size(1), 1, kernel_size, kernel_size, dtype=torch.float32, device=x.device)
+    padding = (kernel_size - 1) // 2
+    padded_x = F.pad(x.float(), mode="replicate", pad=[padding] * 4)
+    dilation = torch.clamp(
+        F.conv2d(padded_x, _kernel, groups=x.size(1)),
+        0, 1
+    )
+    erosion = 1 - torch.clamp(
+        F.conv2d(1 - padded_x, _kernel, groups=x.size(1)),
+        0, 1
+    )
+    edge = dilation - erosion
+    if flatten_channels:
+        edge = edge.max(dim=1, keepdim=True)[0]
+    return edge
+
+
+def target_to_binary_edge(target: torch.Tensor,
+                          num_classes: int,
+                          kernel_size: int,
+                          ignore_index: int = None,
+                          flatten_channels: bool = True) -> torch.Tensor:
+    one_hot = to_one_hot(target, num_classes=num_classes, ignore_index=ignore_index)
+    return one_hot_to_binary_edge(one_hot, kernel_size=kernel_size, flatten_channels=flatten_channels)
+
+
 def get_criteria_from_config(cfg: DotDict) -> Criteria:
     criteria_dict = {}
     for name, cf in cfg.items():
@@ -228,5 +312,7 @@ def get_criterion_from_config(cfg: DotDict):
         return SimpleLoss(ExpAbsLoss(reduction=cfg.reduction, alpha=cfg.alpha), cfg.coef)
     elif cfg.name == 'ohem-ce':
         return SimpleLoss(OhemCrossEntropyLoss(cfg.threshold, cfg.min_kept, cfg.ignore_index), coef=cfg.coef)
+    elif cfg.name == 'dice-bce-edge':
+        return SimpleLoss(DiceBCEEdgeLoss(cfg.no_classes, ignore_index=cfg.ignore_index, weights=cfg.weights), cfg.coef)
     else:
         raise ValueError('loss function not found, got {}'.format(cfg.name))

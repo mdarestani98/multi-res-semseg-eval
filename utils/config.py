@@ -158,6 +158,7 @@ def final_curate(cfg: DotDict):
     for k, criterion in cfg.train.criteria.items():
         cfg.train.criteria[k] = conditional_load_yaml(criterion)
         cfg.train.criteria[k].ignore_index = cfg.data.ignore_index
+        cfg.train.criteria[k].no_classes = cfg.data.no_classes
     for fr in cfg.train.frozen.values():
         fr.model = conditional_load_yaml(fr.model)
         fr.model.device = cfg.train.device
