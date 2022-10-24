@@ -3,6 +3,7 @@ in_channel: 3
 out_channel: data
 backbone: resnet-18-deep
 fpn_dsn: True
+pretrained: False
 criteria:
 - nickname: ce_loss
   name: ce

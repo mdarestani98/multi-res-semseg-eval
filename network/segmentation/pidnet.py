@@ -582,7 +582,8 @@ class PIDNet(nn.Module):
 class Handler(NetworkHandler):
     @staticmethod
     def get_from_config(cfg: DotDict) -> nn.Module:
-        return PIDNet(cfg.m, cfg.n, cfg.out_channel, cfg.planes, cfg.ppm_planes, cfg.head_planes, cfg.aux_output)
+        return PIDNet(cfg.m, cfg.n, cfg.out_channel, cfg.planes, cfg.ppm_planes, cfg.head_planes, cfg.aux_output,
+                      pretrained=cfg.config_name if cfg.pretrained else None)
 
 
 if __name__ == '__main__':

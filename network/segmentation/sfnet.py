@@ -561,14 +561,14 @@ class AlignNetResNet(nn.Module):
 class AlignNetSTDCnet(nn.Module):
 
     def __init__(self, num_classes, trunk='stdc1', flow_conv_type="conv",
-                 head_type="v1", fpn_dsn=False, global_context="ppm", fa_type="spatial"):
+                 head_type="v1", fpn_dsn=False, global_context="ppm", fa_type="spatial", pretrained=False):
         super(AlignNetSTDCnet, self).__init__()
         self.fpn_dsn = fpn_dsn
 
         if trunk == 'stdc1':
-            self.backbone = STDCNet813(norm_layer=nn.BatchNorm2d)
+            self.backbone = STDCNet813(norm_layer=nn.BatchNorm2d, pretrain_model=pretrained)
         elif trunk == 'stdc2':
-            self.backbone = STDCNet1446(norm_layer=nn.BatchNorm2d)
+            self.backbone = STDCNet1446(norm_layer=nn.BatchNorm2d, pretrain_model=pretrained)
         else:
             raise ValueError("Not a valid network arch")
         if head_type == "v2":
@@ -595,37 +595,6 @@ class AlignNetSTDCnet(nn.Module):
         return main_out
 
 
-class STDCnetFPN(nn.Module):
-    def __init__(self, num_classes, trunk='stdc1', flow_conv_type="conv",
-                 head_type="v1", fpn_dsn=False, global_context="ppm", fa_type="spatial"):
-        super(STDCnetFPN, self).__init__()
-        self.fpn_dsn = fpn_dsn
-
-        if trunk == 'stdc1':
-            self.backbone = STDCNet813(norm_layer=nn.BatchNorm2d)
-        elif trunk == 'stdc2':
-            self.backbone = STDCNet1446(norm_layer=nn.BatchNorm2d)
-        else:
-            raise ValueError("Not a valid network arch")
-
-        self.head = UpperNetHead(inplane=1024, num_class=num_classes, norm_layer=nn.BatchNorm2d,
-                                 fpn_inplanes=[64, 256, 512, 1024], fpn_dim=64, conv3x3_type=flow_conv_type,
-                                 fpn_dsn=fpn_dsn, global_context=global_context)
-
-    def forward(self, x, gts=None):
-        x_size = x.size()  # 800
-        feat2, feat4, feat8, feat16, feat32 = self.backbone(x)
-
-        x = self.head([feat4, feat8, feat16, feat32])
-        main_out = F.interpolate(x[0], x_size[2:], mode='bilinear', align_corners=True)
-        if self.training:
-            if not self.fpn_dsn:
-                return main_out
-            else:
-                return x
-        return
-
-
 class Handler(NetworkHandler):
     @staticmethod
     def get_from_config(cfg: DotDict) -> Any:
@@ -635,7 +604,7 @@ class Handler(NetworkHandler):
             cfg.fa_type = 'spatial'
         if 'resnet' in cfg.backbone:
             return AlignNetResNet(num_classes=cfg.out_channel, trunk=cfg.backbone, fpn_dsn=cfg.fpn_dsn,
-                                  head_type=cfg.head_type, fa_type=cfg.fa_type)
+                                  head_type=cfg.head_type, fa_type=cfg.fa_type, pretrained=cfg.pretrained)
         elif 'stdc' in cfg.backbone:
             return AlignNetSTDCnet(num_classes=cfg.out_channel, trunk=cfg.backbone, fpn_dsn=cfg.fpn_dsn,
-                                   head_type=cfg.head_type, fa_type=cfg.fa_type)
+                                   head_type=cfg.head_type, fa_type=cfg.fa_type, pretrained=cfg.pretrained)

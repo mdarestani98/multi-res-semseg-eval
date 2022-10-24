@@ -504,7 +504,7 @@ class Handler(NetworkHandler):
                                 head_planes=64, augment=cfg.aux_output, pretrained=cfg.type if cfg.pretrained else None)
         elif cfg.type == 'ddrnet_39':
             return DualResNet39(BasicBlock, [3, 4, 6, 3], num_classes=cfg.out_channel, planes=64, spp_planes=128,
-                                head_planes=256, augment=cfg.aux_output)
+                                head_planes=256, augment=cfg.aux_output, pretrained=cfg.type if cfg.pretrained else None)
         else:
             raise NotImplementedError
 

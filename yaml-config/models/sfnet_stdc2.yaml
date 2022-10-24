@@ -5,6 +5,7 @@ backbone: stdc2
 head_type: v2
 fpn_dsn: True
 fa_type: spatial_atten
+pretrained: False
 criteria:
 - nickname: ce_loss
   name: ce
