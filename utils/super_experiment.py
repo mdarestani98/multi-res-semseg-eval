@@ -5,9 +5,14 @@ import os.path
 import random
 from collections.abc import Generator
 
-from utils.config import DotDict, load_cfg_from_yaml, product_dict, init_curate, final_curate, PATH_DICT
+from utils.config import DotDict, load_cfg_from_yaml, product_dict, init_curate, final_curate
 from utils.experiment import get_experiment_from_config
 from utils.tools import _parse_str
+
+PATH_DICT = DotDict({'yaml': 'yaml-config',
+                     'data': 'datasets',
+                     'models': 'models',
+                     'criteria': 'criteria'})
 
 
 class SuperExperiment:
@@ -67,12 +72,12 @@ def check_config(cfg: DotDict) -> DotDict:
 
 
 def run_single_experiment(config: DotDict, exp_name: str):
-    print(exp_name)
     final_curate(config)
     experiment = get_experiment_from_config(config)
-    new_bs = experiment.adjust_bs()
+    new_bs = experiment.adjust_bs(adjust_epochs=any([tr.iterations is not None for tr in config.train.trainable.values()]))
     info = decode_tag(exp_name)
     info.update({'batch_size': new_bs})
+    print(info)
     run_no = info.pop('run')
     new_name = create_exp_name(info, run_no)
     for tr in config.train.trainable.values():
@@ -86,7 +91,7 @@ def run_single_experiment(config: DotDict, exp_name: str):
     temp = os.listdir(tr.checkpoint.paths.temp)
     if len(temp) > 0:
         temp = temp[-1]
-        tr.load_checkpoint(temp, weights_only=False)
+        tr.load_checkpoint(os.path.join(tr.checkpoint.paths.temp, temp), weights_only=False)
     experiment.change_exp_name(new_name)
     experiment.train_whole()
     experiment.save_results()

@@ -83,13 +83,6 @@ class DotDict(dict):
         return text[:-2] + '\n}'
 
 
-PATH_DICT = DotDict({'yaml': 'yaml-config',
-                     'data': 'datasets',
-                     'models': 'models',
-                     'criteria': 'criteria',
-                     'weights': 'weights'})
-
-
 def load_cfg_from_yaml(file: str):
     """Load config from a .yaml file"""
 
@@ -160,10 +153,8 @@ def final_curate(cfg: DotDict):
         assert 'pred' in tr.output_keys
         if tr.model.criteria is not None:
             tr.model.criteria = list2dict(tr.model.criteria, 'loss')
-            cfg.train.criteria.update(tr.model.pop('criteria'))
-        if tr.model.pretrained is not None:
-            if os.path.exists(os.path.join(PATH_DICT.weights, f'{tr.model.config_name}#{tr.model.pretrained}')):
-                tr.checkpoint.weights = os.path.join(PATH_DICT.weights, f'{tr.model.config_name}#{tr.model.pretrained}')
+            cfg.train.criteria.update(tr.model.criteria)
+            tr.model.pop('criteria')
     for k, criterion in cfg.train.criteria.items():
         cfg.train.criteria[k] = conditional_load_yaml(criterion)
         cfg.train.criteria[k].ignore_index = cfg.data.ignore_index
@@ -173,9 +164,6 @@ def final_curate(cfg: DotDict):
         if fr.output_keys is None:
             fr.output_keys = ['pred']
         assert 'pred' in fr.output_keys
-        if fr.model.pretrained is not None:
-            if os.path.exists(os.path.join(PATH_DICT.weights, f'{fr.model.config_name}#{fr.model.pretrained}')):
-                fr.checkpoint.weights = os.path.join(PATH_DICT.weights, f'{fr.model.config_name}#{fr.model.pretrained}')
 
     if not cfg.train.has('type'):
         if len(cfg.train.frozen) == 0:

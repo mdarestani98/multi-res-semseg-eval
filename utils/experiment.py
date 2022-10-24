@@ -258,15 +258,19 @@ class Experiment(ABC):
     def _default_func(logit: Tensor, **kwargs) -> Tensor:
         return logit.max(1)[1].squeeze()
 
-    def change_bs(self, new_bs) -> None:
+    def change_bs(self, new_bs, change_epochs: bool = True) -> None:
         if new_bs == self.batch_size:
             return
+        old_bs = self.batch_size
         self.batch_size = new_bs
         self.loaders = DotDict({key: DataLoader(self.datasets[key], batch_size=self.batch_size if key == 'train' else 1,
                                                 shuffle=key == 'train',
                                                 num_workers=self.workers if key == 'train' else 1,
                                                 pin_memory=key == 'train', drop_last=key == 'train')
                                 for key in self.datasets.keys()})
+        if change_epochs:
+            for tr in self.trainables.values():
+                tr.epochs = tr.epochs // old_bs * self.batch_size
 
     def two_epoch_test(self) -> bool:
         try:
@@ -285,7 +289,7 @@ class Experiment(ABC):
         except RuntimeError:
             return False
 
-    def adjust_bs(self):
+    def adjust_bs(self, adjust_epochs: bool = True) -> int:
         print('Testing different batch sizes, it may take a while.')
         while self.batch_size > 0:
             res = self.two_epoch_test()
@@ -294,10 +298,11 @@ class Experiment(ABC):
             if res:
                 break
             else:
-                self.change_bs(self.batch_size - 1)
+                self.change_bs(self.batch_size - 1, adjust_epochs)
         return self.batch_size
 
     def change_exp_name(self, new_name):
+        self.name = new_name
         self.writer.exp_name = new_name
 
 
