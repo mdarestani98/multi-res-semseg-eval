@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from typing import Union, List, Tuple, Any
 
-from network.segmentation.stdc_backbone import AbstractSTDCBackbone, SegmentationHead, STDC2Backbone, STDC1Backbone, \
+from network.segmentation.stdc import AbstractSTDCBackbone, SegmentationHead, STDC2Backbone, STDC1Backbone, \
     ConvBNReLU
 from utils.config import DotDict
 from utils.tools import NetworkHandler
@@ -351,9 +351,9 @@ class Handler(NetworkHandler):
     @staticmethod
     def get_from_config(cfg: DotDict) -> Any:
         if cfg.type == 'b':
-            return PPLiteSegB(cfg.out_channel, cfg.in_channel, cfg.dropout, cfg.aux_output)
+            return PPLiteSegB(cfg.out_channel, cfg.in_channel, cfg.dropout, cfg.aux_output, cfg.pretrained)
         elif cfg.type == 't':
-            return PPLiteSegT(cfg.out_channel, cfg.in_channel, cfg.dropout, cfg.aux_output)
+            return PPLiteSegT(cfg.out_channel, cfg.in_channel, cfg.dropout, cfg.aux_output, cfg.pretrained)
         else:
             raise ValueError(f'Only type b and t are valid, got {cfg.type}')
 
