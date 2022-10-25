@@ -34,5 +34,5 @@ The code is developed under the following configurations:
 
 - Download [Cityscapes](https://www.cityscapes-dataset.com/) and 
 [CamVid](https://www.kaggle.com/datasets/carlolepelaars/camvid) and unzip them into `data/cityscapes` and `data/CamVid` 
-respectively. Run `prepare_data.py` from `dataset/{dataset-name}.py` to parse image files and save path lists.
+respectively. Run `prepare_data({dataset-dir})` from `dataset/{dataset-name}.py` to parse image files and save path lists.
 - 

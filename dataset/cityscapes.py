@@ -3,16 +3,14 @@ import os.path
 import pickle
 import re
 from collections import namedtuple
-from collections.abc import Callable
+from typing import Tuple
 
 import cv2
 import numpy as np
 import pandas as pd
 import tqdm
-from typing import Tuple
 
-from dataset.general import BaseDataset, GeneralHandler
-from utils.config import DotDict
+from dataset.general import GeneralHandler
 
 Label = namedtuple('Label', ['name', 'id', 'trainId', 'category', 'categoryId', 'hasInstances', 'ignoreInEval', 'color'])
 
@@ -99,3 +97,11 @@ def create_dataframe(root: str, save: bool = True) -> Tuple[pd.DataFrame, ...]:
             df.to_pickle(os.path.join(root, f'{split}.pkl'), protocol=pickle.HIGHEST_PROTOCOL)
     return tuple(dfs)
 
+
+def prepare_data(root: str) -> None:
+    train_id_list = glob.glob(os.path.join(root, '**', '*_trainIds.png'), recursive=True)
+    if len(train_id_list) == 0:
+        create_train_id(root)
+    splits = ['train', 'val', 'test']
+    if not all([os.path.exists(os.path.join(root, f'{split}.pkl')) for split in splits]):
+        create_dataframe(root, save=True)

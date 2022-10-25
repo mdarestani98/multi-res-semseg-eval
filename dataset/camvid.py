@@ -70,3 +70,12 @@ def create_dataframe(root: str, save: bool = True) -> Tuple[pd.DataFrame, ...]:
         if save:
             df.to_pickle(os.path.join(root, f'{split}.pkl'), protocol=pickle.HIGHEST_PROTOCOL)
     return tuple(dfs)
+
+
+def prepare_data(root: str) -> None:
+    train_id_list = glob.glob(os.path.join(root, '**', '*_labelTrainIds.png'), recursive=True)
+    if len(train_id_list) == 0:
+        convert_annotations(root)
+    splits = ['train', 'val', 'test']
+    if not all([os.path.exists(os.path.join(root, f'{split}.pkl')) for split in splits]):
+        create_dataframe(root, save=True)
