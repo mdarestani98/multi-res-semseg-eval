@@ -1,6 +1,6 @@
 name: sfnet
 in_channel: 3
-out_channel: 8
+out_channel: data
 backbone: stdc2
 head_type: v2
 fpn_dsn: True
