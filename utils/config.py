@@ -121,7 +121,8 @@ def init_curate(cfg: DotDict):
     if cfg.train.criteria is None:
         cfg.train.criteria = []
     cfg.train.criteria = list2dict(cfg.train.criteria, 'loss')
-    assert cfg.train.has('trainable')
+    if cfg.train.trainable is None:
+        cfg.train.trainable = []
     cfg.train.trainable = list2dict(cfg.train.trainable, 'trainable')
     if cfg.train.frozen is None:
         cfg.train.frozen = []
@@ -162,9 +163,17 @@ def final_curate(cfg: DotDict):
     for fr in cfg.train.frozen.values():
         fr.model = conditional_load_yaml(fr.model)
         fr.model.device = cfg.train.device
+        if fr.model.out_channel == 'data':
+            fr.model.out_channel = cfg.data.no_classes
         if fr.output_keys is None:
-            fr.output_keys = ['pred']
+            if fr.model.has('output_keys'):
+                fr.output_keys = fr.model.output_keys
+                fr.model.pop('output_keys')
+            else:
+                fr.output_keys = ['pred']
         assert 'pred' in fr.output_keys
+        if fr.model.criteria is not None:
+            fr.model.pop('criteria')
 
     if not cfg.train.has('type'):
         if len(cfg.train.frozen) == 0:
@@ -175,6 +184,8 @@ def final_curate(cfg: DotDict):
         else:
             if any(fr.nickname == 'teacher' for fr in cfg.train.frozen.values()):
                 cfg.train.type = 'kd'
+            elif len(cfg.train.trainable) == 0:
+                cfg.train.type = 'inference-only'
 
     if cfg.train.no_classes == 'data':
         cfg.train.no_classes = cfg.data.no_classes
@@ -183,9 +194,12 @@ def final_curate(cfg: DotDict):
     if not cfg.train.has('display_metric'):
         cfg.train.display_metric = 'iou'
 
-    cfg.train.writer = DotDict()
-    cfg.train.writer.logdir = os.path.join(cfg.train.save_path, cfg.data.name, 'sw-logs')
-    cfg.train.writer.exp_name = cfg.train.exp_name
+    if cfg.train.type != 'inference-only':
+        cfg.train.writer = DotDict()
+        cfg.train.writer.logdir = os.path.join(cfg.train.save_path, cfg.data.name, 'sw-logs')
+        cfg.train.writer.exp_name = cfg.train.exp_name
+    else:
+        cfg.train.writer = DotDict({})
 
 
 def create_paths(cfg: DotDict, data_name: str, exp_name: str):
