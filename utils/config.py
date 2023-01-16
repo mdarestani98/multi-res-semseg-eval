@@ -190,6 +190,7 @@ def final_curate(cfg: DotDict):
     if cfg.train.no_classes == 'data':
         cfg.train.no_classes = cfg.data.no_classes
     cfg.train.metrics.no_classes = cfg.train.no_classes
+    cfg.train.metrics.ignore_index = cfg.data.ignore_index
 
     if not cfg.train.has('display_metric'):
         cfg.train.display_metric = 'iou'

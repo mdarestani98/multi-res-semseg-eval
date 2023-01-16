@@ -165,13 +165,14 @@ def get_metrics_from_config(cfg: DotDict, arch_type: str = None) -> DotDict:
         arch_type = 'segmenter'
     metrics_dict = {}
     for key in cfg.keys():
-        if key not in ['general', 'no_classes']:
+        if key not in ['general', 'no_classes', 'ignore_index']:
             cfg.general += [key + '.' + name for name in cfg[key]]
             metrics = _parse_metrics(cfg[key], model_type=arch_type)
             metrics_dict[key] = metrics
     general_metrics = _parse_metrics(cfg.general, model_type=arch_type, is_general=True)
     metrics_dict['general'] = general_metrics
     metrics_dict['no_classes'] = cfg.no_classes
+    metrics_dict['ignore_index'] = cfg.ignore_index
     return DotDict(metrics_dict)
 
 
@@ -190,11 +191,11 @@ def _parse_metrics(metrics_names: List[str], model_type: str, is_general: bool =
         elif model_type == 'segmenter':
             if any(item in name.lower() for name in metrics_names for item in ['iou', 'accuracy']):
                 metrics.add_metric(Metric('area intersection', func=_intersection, output_keys=['invisible', 'sum'],
-                                          input_keys=['pred', 'target', 'no_classes']))
+                                          input_keys=['pred', 'target', 'no_classes', 'ignore_index']))
                 metrics.add_metric(Metric('area union', func=_union, output_keys=['invisible', 'sum'],
-                                          input_keys=['pred', 'target', 'no_classes']))
+                                          input_keys=['pred', 'target', 'no_classes', 'ignore_index']))
                 metrics.add_metric(Metric('area target', func=_target, output_keys=['invisible', 'sum'],
-                                          input_keys=['target', 'no_classes']))
+                                          input_keys=['target', 'no_classes', 'ignore_index']))
         if any('f1' in name.lower() for name in metrics_names):
             metrics_names = metrics_names + ['precision', 'recall']
     metrics_names = list(set(metrics_names))
@@ -257,6 +258,11 @@ def _parse_metrics(metrics_names: List[str], model_type: str, is_general: bool =
     return metrics
 
 
+""" TODO: following functions does not consider ignore_index
+    probably add another item to data tuple (being ignore_index) and mask error/score maps with that
+"""
+
+
 def _fp(data: Tuple[torch.Tensor, torch.Tensor]):
     pred, target = torch.clone(data[0]).reshape((-1)), torch.clone(data[1]).reshape((-1))
     return torch.sum(pred / target == float('inf')).detach().cpu().numpy()
@@ -277,22 +283,24 @@ def _tn(data: Tuple[torch.Tensor, torch.Tensor]):
     return torch.sum(torch.isnan(pred / target)).detach().cpu().numpy()
 
 
-def _intersection(data: Tuple[torch.Tensor, torch.Tensor, int]):
+def _intersection(data: Tuple[torch.Tensor, torch.Tensor, int, int]):
     pred, target, k = torch.clone(data[0]), torch.clone(data[1]), data[2]
     pred, target = pred.view(-1), target.view(-1)
-    assert pred.shape == target.shape
+    # assert pred.shape == target.shape
     return torch.histc(pred[pred == target], bins=k, min=0, max=k - 1).detach().cpu().numpy()
 
 
-def _union(data: Tuple[torch.Tensor, torch.Tensor, int]):
-    pred, k = torch.clone(data[0]), data[2]
-    pred = pred.view(-1)
+def _union(data: Tuple[torch.Tensor, torch.Tensor, int, int]):
+    pred, target, k, ignore_index = torch.clone(data[0]), torch.clone(data[1]), data[2], data[3]
+    pred, target = pred.view(-1), target.view(-1)
+    pred = pred[target != ignore_index]
     return _target(data[1:]) - _intersection(data) + torch.histc(pred, bins=k, min=0, max=k - 1).detach().cpu().numpy()
 
 
-def _target(data: Tuple[torch.Tensor, int]):
-    target, k = torch.clone(data[0]), data[1]
+def _target(data: Tuple[torch.Tensor, int, int]):
+    target, k, ignore_index = torch.clone(data[0]), data[1], data[2]
     target = target.view(-1)
+    target = target[target != ignore_index]
     return torch.histc(target, bins=k, min=0, max=k - 1).detach().cpu().numpy()
 
 

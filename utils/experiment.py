@@ -357,8 +357,9 @@ class InferenceExperiment(Experiment):
             predictions, losses, final_target = self._forward_batch(self.network, sample)
             data_dict = {'time': PrintableTime((time.time() - end_time) / n),
                          'pred': self._default_func(predictions['pred']), 'target': final_target,
-                         'no_classes': self.metrics.no_classes}
+                         'no_classes': self.metrics.no_classes, 'ignore_index': self.metrics.ignore_index}
             data_dict.update({k: v.item() for k, v in losses.items()})
+            # print(data_dict.keys())
             metrics.update(data_dict, count=n)
             progress.set_description(f'{title} {self.display_metric}: {float(metrics[self.display_metric]):.4f}')
         progress.close()
