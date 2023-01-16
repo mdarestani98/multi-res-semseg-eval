@@ -1,0 +1,29 @@
+data: #dataset yaml file name
+
+train:
+  type: inference-only
+  manual_seed: 104
+  evaluate: True
+  device: cuda
+  no_classes: data
+  batch_size: 1
+  workers: 1
+  save_path:
+
+  frozen:
+  - nickname: network
+    evaluate: True
+    model:
+
+    checkpoint:
+      weights:
+
+  augmentation:
+    scale: 2
+    rotate: [ 0.0, 0.0 ]
+    size: [ 320, 320 ]
+
+  metrics:
+    general: [  ]
+    train: [ 'iou', 'accuracy' ]
+    val: [ 'iou', 'accuracy' ]
