@@ -549,6 +549,7 @@ class AlignNetResNet(nn.Module):
         x3 = self.layer3(x2)  # 100
         x4 = self.layer4(x3)  # 100
         x = self.head([x1, x2, x3, x4])
+        x = [x[0]] + x[1]
         x = [F.interpolate(xt, x_size[2:], mode='bilinear', align_corners=True) for xt in x if xt is not None]
         main_out = x[0]
         if self.training:
