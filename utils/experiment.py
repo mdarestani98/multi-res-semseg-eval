@@ -334,6 +334,44 @@ class SimpleExperiment(Experiment):
         super(SimpleExperiment, self).save_results(test, save_model)
 
 
+class InferenceExperiment(Experiment):
+    def __init__(self, cfg: DotDict) -> None:
+        super(InferenceExperiment, self).__init__(cfg)
+        self.network = self.frozens['network']
+
+    def train_inference_epoch(self, train: bool, verbose: bool = True) -> Dict[str, Any]:
+        torch.cuda.empty_cache()
+        self.network.eval()
+
+        title = 'Evaluating'
+        loader = self.loaders.get('val')
+        metrics = self.metrics['val']
+        progress = tqdm(tools.IteratorTimer(loader), ncols=150, total=len(loader), smoothing=0.9, miniters=1,
+                        leave=True, desc=title, disable=not verbose)
+
+        end_time = time.time()
+        for _, sample in enumerate(progress):
+            n = sample[0].size(0)
+            sample = {'image': sample[0].to(self.network.device), 'target': sample[1].to(self.network.device),
+                      'edge': sample[3].to(self.network.device)}
+            predictions, losses, final_target = self._forward_batch(self.network, sample)
+            data_dict = {'time': PrintableTime((time.time() - end_time) / n),
+                         'pred': self._default_func(predictions['pred']), 'target': final_target,
+                         'no_classes': self.metrics.no_classes}
+            data_dict.update({k: v.item() for k, v in losses.items()})
+            metrics.update(data_dict, count=n)
+            progress.set_description(f'{title} {self.display_metric}: {float(metrics[self.display_metric]):.4f}')
+        progress.close()
+        results = generate_results(metrics, 'train' if train else 'val')
+        return results
+
+    def _forward_batch(self, network: TrainableHandler, sample: Dict[str, Tensor]) -> Tuple[Dict[str, Tensor],
+                                                                                            Dict[str, Tensor], Tensor]:
+        predictions = network.forward(sample['image'])
+        predictions.update(sample)
+        return predictions, {}, sample['target']
+
+
 def set_manual_seed(seed: int = None) -> None:
     if seed is not None:
         random.seed(seed)
@@ -344,7 +382,7 @@ def set_manual_seed(seed: int = None) -> None:
         cudnn.benchmark = True
 
 
-EXP = {'simple': SimpleExperiment}
+EXP = {'simple': SimpleExperiment, 'inference-only': InferenceExperiment}
 DEFAULT_EXP = EXP['simple']
 
 

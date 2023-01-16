@@ -16,8 +16,8 @@ PATH_DICT = DotDict({'yaml': 'yaml-config',
 
 
 class SuperExperiment:
-    def __init__(self, cfg: DotDict) -> None:
-        cfg = check_config(cfg)
+    def __init__(self, cfg: DotDict, model_tweak: bool) -> None:
+        cfg = check_config(cfg, model_tweak)
         self.base_config = load_cfg_from_yaml(cfg.base_config)
         init_curate(self.base_config)
         self.repeats = cfg.repeats
@@ -51,14 +51,15 @@ class SuperExperiment:
                 run_single_experiment(config, exp_name)
 
 
-def check_config(cfg: DotDict) -> DotDict:
+def check_config(cfg: DotDict, model_tweak: bool = True) -> DotDict:
     assert cfg.has('base_config')
     cfg.base_config = os.path.join(PATH_DICT.yaml, cfg.base_config)
     assert cfg.has('data')
-    assert cfg.has('models')
-    for k, name_list in cfg.models.items():
-        cfg[f'models.{k}'] = name_list
-    del cfg['models']
+    if model_tweak:
+        assert cfg.has('models')
+        for k, name_list in cfg.models.items():
+            cfg[f'models.{k}'] = name_list
+        del cfg['models']
     if cfg.has('criteria'):
         for k, name_list in cfg.criteria.items():
             cfg[f'criteria.{k}'] = name_list
@@ -73,28 +74,32 @@ def check_config(cfg: DotDict) -> DotDict:
 
 def run_single_experiment(config: DotDict, exp_name: str):
     final_curate(config)
+    print(config)
     experiment = get_experiment_from_config(config)
-    new_bs = experiment.adjust_bs(adjust_epochs=any([tr.iterations is not None for tr in config.train.trainable.values()]))
-    info = decode_tag(exp_name)
-    info.update({'batch_size': new_bs})
-    print(info)
-    run_no = info.pop('run')
-    new_name = create_exp_name(info, run_no)
-    for tr in config.train.trainable.values():
-        if os.path.exists(os.path.join(tr.checkpoint.paths.model, f'{new_name}_{tr.nickname}.pth')):
-            return
-    if not new_name == exp_name:
+    if config.train.type != 'inference-only':
+        new_bs = experiment.adjust_bs(adjust_epochs=any([tr.iterations is not None for tr in config.train.trainable.values()]))
+        info = decode_tag(exp_name)
+        info.update({'batch_size': new_bs})
+        print(info)
+        run_no = info.pop('run')
+        new_name = create_exp_name(info, run_no)
         for tr in config.train.trainable.values():
-            os.rmdir(tr.checkpoint.paths.result)
-            os.mkdir(os.path.join(tr.checkpoint.paths.results_dir, new_name))
-    tr = config.train.trainable.network
-    temp = os.listdir(tr.checkpoint.paths.temp)
-    if len(temp) > 0:
-        temp = temp[-1]
-        tr.load_checkpoint(os.path.join(tr.checkpoint.paths.temp, temp), weights_only=False)
-    experiment.change_exp_name(new_name)
-    experiment.train_whole()
-    experiment.save_results()
+            if os.path.exists(os.path.join(tr.checkpoint.paths.model, f'{new_name}_{tr.nickname}.pth')):
+                return
+        if not new_name == exp_name:
+            for tr in config.train.trainable.values():
+                os.rmdir(tr.checkpoint.paths.result)
+                os.mkdir(os.path.join(tr.checkpoint.paths.results_dir, new_name))
+        tr = config.train.trainable.network
+        temp = os.listdir(tr.checkpoint.paths.temp)
+        if len(temp) > 0:
+            temp = temp[-1]
+            tr.load_checkpoint(os.path.join(tr.checkpoint.paths.temp, temp), weights_only=False)
+        experiment.change_exp_name(new_name)
+        experiment.train_whole()
+        experiment.save_results()
+    else:
+        experiment.train_inference_epoch(train=False)
 
 
 def curate_change(change: DotDict):
@@ -126,6 +131,7 @@ def curate_change(change: DotDict):
 
 
 def create_exp_name(change: DotDict, run_no: int, item_delim: str = '#', kw_delim: str = '@') -> str:
+    print(change)
     if change.has('data'):
         name = f'{change.data}{item_delim}'
     else:
