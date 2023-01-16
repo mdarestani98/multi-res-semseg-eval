@@ -211,11 +211,17 @@ class PrintableTime(object):
 class MySummaryWriter(object):
     """Two SummaryWriter instances to log the result of training in two separate formats"""
     def __init__(self, logdir: str, exp_name: str):
+        if logdir is None:
+            self.general_writer = None
+            self.individual_writer = None
+            return
         self.exp_name = exp_name
         self.general_writer = SummaryWriter(os.path.join(logdir, 'general'))
         self.individual_writer = SummaryWriter(os.path.join(logdir, 'experiments'))
 
     def add_results(self, results: dict, epoch: int):
+        if self.general_writer is None:
+            return
         for k, v in results.items():
             self.general_writer.add_scalars(k.replace('.', '/'), {self.exp_name: v}, global_step=epoch)
         for k, v in dict2sw_format(results).items():
@@ -225,6 +231,8 @@ class MySummaryWriter(object):
                 self.individual_writer.add_scalar(self.exp_name + '/' + k, v, global_step=epoch)
 
     def close(self):
+        if self.general_writer is None:
+            return
         self.general_writer.close()
         self.individual_writer.close()
 
