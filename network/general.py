@@ -3,13 +3,13 @@ from torch import nn
 from typing import Iterator
 
 from network import scheduler
-from network.segmentation import fastscnn, unet, pidnet, hrnet, sfnet, ppliteseg, regseg, bisenet, ddrnet
+from network.segmentation import fastscnn, unet, pidnet, hrnet, sfnet, ppliteseg, regseg, bisenet, ddrnet, stdc
 from utils.config import DotDict
 
 
 NETWORK = {'unet': unet.Handler, 'hrnet': hrnet.Handler, 'fastscnn': fastscnn.Handler, 'pidnet': pidnet.Handler,
            'sfnet': sfnet.Handler, 'ppliteseg': ppliteseg.Handler, 'regseg': regseg.Handler, 'bisenet': bisenet.Handler,
-           'ddrnet': ddrnet.Handler}
+           'ddrnet': ddrnet.Handler, 'stdc': stdc.Handler}
 DEFAULT_NETWORK = NETWORK['unet']
 
 OPTIMIZER = {'adam': torch.optim.Adam, 'sgd': torch.optim.SGD}

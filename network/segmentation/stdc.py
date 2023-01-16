@@ -600,9 +600,9 @@ class Handler(NetworkHandler):
     @staticmethod
     def get_from_config(cfg: DotDict) -> Any:
         if cfg.type == 1:
-            return STDC1Seg(cfg.out_channel, cfg.in_channel, cfg.dropout, cfg.aux, cfg.pretrained)
+            return STDC1Seg(cfg.out_channel, cfg.in_channel, cfg.dropout, cfg.aux_output, cfg.pretrained)
         elif cfg.type == 2:
-            return STDC2Seg(cfg.out_channel, cfg.in_channel, cfg.dropout, cfg.aux, cfg.pretrained)
+            return STDC2Seg(cfg.out_channel, cfg.in_channel, cfg.dropout, cfg.aux_output, cfg.pretrained)
         else:
             raise NotImplementedError
 
