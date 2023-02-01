@@ -1,3 +1,4 @@
+fvcore
 matplotlib
 numpy
 opencv-contrib-python-headless
@@ -13,4 +14,4 @@ torch
 torchaudio
 --find-links https://download.pytorch.org/whl/torch_stable.html
 torchvision
-tqdm==4.64.1
+tqdm

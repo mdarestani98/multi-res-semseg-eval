@@ -299,3 +299,20 @@ def _parse_str(s: str):
     except ValueError:
         val = s
     return val
+
+
+def calculate_flops(model: torch.Module):
+    from fvcore.nn import FlopCountAnalysis, flop_count_table
+    model.eval()
+    x = torch.randn(1, 3, 1024, 2048)
+    flops = FlopCountAnalysis(model, x)
+    print(flop_count_table(flops))
+
+
+def calculate_params(model):
+    # https://discuss.pytorch.org/t/how-do-i-check-the-number-of-parameters-of-a-model/4325/6
+    model_parameters = filter(lambda p: p.requires_grad, model.parameters())
+    params = sum([np.prod(p.size()) for p in model_parameters])
+    model_parameters = model.parameters()
+    params2 = sum([np.prod(p.size()) for p in model_parameters])
+    return params, params2

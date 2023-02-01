@@ -295,27 +295,6 @@ class Handler(NetworkHandler):
         return RegSeg(cfg.type, cfg.out_channel)
 
 
-# def calculate_flops():
-#     from fvcore.nn import FlopCountAnalysis, flop_count_table, ActivationCountAnalysis
-#     model1 = RegSeg("exp48_decoder26", 19).eval()
-#     from competitors_models.DDRNet_Reimplementation import get_ddrnet_23, get_ddrnet_23slim
-#     x = torch.randn(1, 3, 1024, 2048)
-#     model2 = get_ddrnet_23().eval()
-#     for model in [model1, model2]:
-#         flops = FlopCountAnalysis(model, x)
-#         print(flop_count_table(flops))
-
-
-def calculate_params(model):
-    # https://discuss.pytorch.org/t/how-do-i-check-the-number-of-parameters-of-a-model/4325/6
-    import numpy as np
-    model_parameters = filter(lambda p: p.requires_grad, model.parameters())
-    params = sum([np.prod(p.size()) for p in model_parameters])
-    model_parameters = model.parameters()
-    params2 = sum([np.prod(p.size()) for p in model_parameters])
-    return params, params2
-
-
 def generate_stage(num, block_fun):
     blocks = []
     for _ in range(num):
