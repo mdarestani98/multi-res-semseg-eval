@@ -74,7 +74,6 @@ def check_config(cfg: DotDict, model_tweak: bool = True) -> DotDict:
 
 def run_single_experiment(config: DotDict, exp_name: str):
     final_curate(config)
-    print(config)
     experiment = get_experiment_from_config(config)
     if config.train.type != 'inference-only':
         new_bs = experiment.adjust_bs(adjust_epochs=any([tr.iterations is not None for tr in config.train.trainable.values()]))

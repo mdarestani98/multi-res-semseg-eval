@@ -2,7 +2,9 @@ name: sfnet
 in_channel: 3
 out_channel: data
 backbone: resnet-18-deep
+head_type: v2 # remove for original
 fpn_dsn: True
+fa_type: spatial_atten # remove for original
 pretrained: False
 criteria:
 - nickname: ce_loss
